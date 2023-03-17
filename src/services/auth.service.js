@@ -30,7 +30,8 @@ const login = (email, password, rememberMe) => {
 
 const logout = () => {
   return axios
-    .post(`${NEWS_API_BASE_URL}/logout`,  
+    .post(`${NEWS_API_BASE_URL}/logout`, 
+    {},  
     { 
       headers: authenticationHeader()
     })

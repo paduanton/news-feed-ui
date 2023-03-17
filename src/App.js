@@ -2,12 +2,15 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Routes, Route, Link, useLocation } from "react-router-dom";
 
+import Navbar from 'react-bootstrap/Navbar';
+import Container from 'react-bootstrap/Container';
+import Button from 'react-bootstrap/Button';
+
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./App.css";
 
 import Login from "./components/Login";
 import Signup from "./components/Signup";
-import Home from "./components/Home";
+import Feed from "./components/Feed";
 import Profile from "./components/Profile";
 import BoardUser from "./components/BoardUser";
 import BoardModerator from "./components/BoardModerator";
@@ -16,106 +19,56 @@ import BoardAdmin from "./components/BoardAdmin";
 import { logout } from "./actions/auth";
 import { clearMessage } from "./actions/message";
 
-import EventBus from "./common/EventBus";
 
 const App = () => {
+  const dispatch = useDispatch();
+
   const [showModeratorBoard, setShowModeratorBoard] = useState(false);
   const [showAdminBoard, setShowAdminBoard] = useState(false);
 
-  const { user: currentUser } = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
-
-  let location = useLocation();
-
-  useEffect(() => {
-    if (["/login", "/register"].includes(location.pathname)) {
-      dispatch(clearMessage()); // clear message when changing location
-    }
-  }, [dispatch, location]);
+  const { user: authenticatedUser, isLoggedIn } = useSelector((state) => state.auth);
 
   const logOut = useCallback(() => {
     dispatch(logout());
   }, [dispatch]);
 
-  useEffect(() => {
-    if (currentUser) {
-      setShowModeratorBoard(true);
-      setShowModeratorBoard(true);
-    } else {
-      setShowModeratorBoard(false);
-      setShowAdminBoard(false);
-    }
-
-    EventBus.on("logout", () => {
-      logOut();
-    });
-
-    return () => {
-      EventBus.remove("logout");
-    };
-  }, [currentUser, logOut]);
+  const redirectTo = (url) => {
+    window.location.assign(url);
+  }
 
   return (
     <div>
-      <nav className="navbar navbar-expand navbar-dark bg-dark">
-        <Link to={"/"} className="navbar-brand">
-          
-        </Link>
-        <div className="navbar-nav mr-auto">
-          <li className="nav-item">
-            <Link to={"/home"} className="nav-link">
-              Home
-            </Link>
-          </li>
-
-          
-          {currentUser && (
-            <li className="nav-item">
-              <Link to={"/user"} className="nav-link">
-                User
-              </Link>
-            </li>
-          )}
-        </div>
-
-        {currentUser ? (
-          <div className="navbar-nav ml-auto">
-            <li className="nav-item">
-              <Link to={"/profile"} className="nav-link">
-                {currentUser.username}
-              </Link>
-            </li>
-            <li className="nav-item">
-              <a href="/login" className="nav-link" onClick={logOut}>
-                LogOut
-              </a>
-            </li>
-          </div>
-        ) : (
-          <div className="navbar-nav ml-auto">
-            <li className="nav-item">
-              <Link to={"/login"} className="nav-link">
-                Login
-              </Link>
-            </li>
-
-            <li className="nav-item">
-              <Link to={"/register"} className="nav-link">
-                Sign Up
-              </Link>
-            </li>
-          </div>
-        )}
-      </nav>
+      <Navbar bg="dark" variant="dark">
+      <Container>
+        <Navbar.Brand href="/">News Feed App</Navbar.Brand>
+        <Navbar.Toggle />
+        <Navbar.Collapse className="justify-content-end">
+          <Navbar.Text>
+          {isLoggedIn ? (
+            <>
+              <Button variant="light" onClick={() => redirectTo("/profile")}>Profile</Button>
+              {' '}
+              <Button variant="light" onClick={() => logOut()}>Logout</Button>
+            </>
+            ) : (
+              <>
+               <Button variant="light" onClick={() => redirectTo("/login")}>Login</Button>
+                {' '}
+                <Button variant="light" onClick={() => redirectTo("/signup")}>Signup</Button>
+              </>
+            )}
+          </Navbar.Text>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
 
       <div className="container mt-3">
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/home" element={<Home />} />
+          <Route path="/" element={<Feed />} />
+          <Route path="/feed" element={<Feed />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Signup />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/user" element={<BoardUser />} />
         </Routes>
       </div>
 

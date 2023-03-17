@@ -85,9 +85,14 @@ export const login = (email, password, rememberMe) => (dispatch) => {
 export const logout = () => (dispatch) => {
   return AuthService.logout().then(
     (data) => {
+      localStorage.removeItem("userId");
+      localStorage.setItem("accessToken");
+
       dispatch({
         type: LOGOUT,
       });
+
+      window.location.assign("/");
 
       return Promise.resolve();
     },
