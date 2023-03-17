@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Routes, Route, Link, useLocation } from "react-router-dom";
+import { Routes, Route, } from "react-router-dom";
 
 import Navbar from 'react-bootstrap/Navbar';
 import Container from 'react-bootstrap/Container';
@@ -12,24 +12,19 @@ import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Feed from "./components/Feed";
 import Profile from "./components/Profile";
-import BoardUser from "./components/BoardUser";
-import BoardModerator from "./components/BoardModerator";
-import BoardAdmin from "./components/BoardAdmin";
 
 import { logout } from "./actions/auth";
-import { clearMessage } from "./actions/message";
 
 
 const App = () => {
   const dispatch = useDispatch();
 
-  const [showModeratorBoard, setShowModeratorBoard] = useState(false);
-  const [showAdminBoard, setShowAdminBoard] = useState(false);
-
-  const { user: authenticatedUser, isLoggedIn } = useSelector((state) => state.auth);
+  const { isLoggedIn } = useSelector((state) => state.auth);
 
   const logOut = useCallback(() => {
     dispatch(logout());
+
+    window.location.assign("/");
   }, [dispatch]);
 
   const redirectTo = (url) => {

@@ -1,8 +1,6 @@
 import {
   SIGNUP_SUCCESS,
-  SIGNUP_FAIL,
   LOGIN_SUCCESS,
-  LOGIN_FAIL,
   LOGOUT,
   SET_MESSAGE,
 } from "./types";
@@ -91,9 +89,7 @@ export const logout = () => (dispatch) => {
       dispatch({
         type: LOGOUT,
       });
-
-      window.location.assign("/");
-
+      
       return Promise.resolve();
     },
     (error) => {

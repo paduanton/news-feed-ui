@@ -18,26 +18,6 @@ const getUser = (id)  => {
   });
 };
 
-const getUserFeedPreferences = (id)  => {
-  return axios.get(`${NEWS_API_BASE_URL}/users/${id}/feed_preferences`, 
-    { 
-      headers: authenticationHeader()
-    }
-  )
-  .then((response) => {
-    const { type, content, created_at } = response.data;
-    return {
-      type,
-      content,
-      createdAt: created_at,
-    };
-  });
-};
-
-
-
-
 export default {
   getUser,
-  getUserFeedPreferences,
 };

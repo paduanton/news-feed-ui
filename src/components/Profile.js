@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Navigate } from 'react-router-dom';
 import { useSelector } from "react-redux";
 
-import Badge from 'react-bootstrap/Badge';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import ListGroup from 'react-bootstrap/ListGroup';
@@ -12,7 +11,7 @@ import UserService from "../services/user.service";
 const Profile = () => {
   const [userData, setUserData] = useState({});
 
-  const { user: authenticatedUser } = useSelector((state) => state.auth);
+  const { user: authenticatedUser, isLoggedIn } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -24,7 +23,7 @@ const Profile = () => {
     fetchUserData();
   }, []);
 
-  if (!authenticatedUser) {
+  if (!isLoggedIn) {
     return <Navigate to="/login" />;
   }
 
