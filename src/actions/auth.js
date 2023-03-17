@@ -27,10 +27,6 @@ export const signup = (name, username, email, password, rememberMe) => (dispatch
       const message = error.response.data.message;
 
       dispatch({
-        type: SIGNUP_FAIL,
-      });
-
-      dispatch({
         type: SET_MESSAGE,
         payload: message,
       });
@@ -40,8 +36,8 @@ export const signup = (name, username, email, password, rememberMe) => (dispatch
   );
 };
 
-export const login = (email, password) => (dispatch) => {
-  return AuthService.login(email, password).then(
+export const login = (email, password, rememberMe) => (dispatch) => {
+  return AuthService.login(email, password, rememberMe).then(
     (data) => {
       dispatch({
         type: LOGIN_SUCCESS,
@@ -52,10 +48,6 @@ export const login = (email, password) => (dispatch) => {
     },
     (error) => {
       const message = error.response.data.message;
-
-      dispatch({
-        type: LOGIN_FAIL,
-      });
 
       dispatch({
         type: SET_MESSAGE,

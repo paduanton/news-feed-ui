@@ -7,29 +7,31 @@ const signup = (name, username, email, password, rememberMe)  => {
     username,
     email,
     password,
-    rememberMe,
+    remember_me: rememberMe,
   })
   .then((response) => {
-      const responseBody = JSON.stringify(response.data);
+      const responseBody = response.data;
+
 
       localStorage.setItem("userId", responseBody.id);
-      localStorage.setItem("accessToken", responseBody.accessToken);
+      localStorage.setItem("accessToken", responseBody.auth_resource.access_token);
 
     return responseBody;
   });
 };
 
-const login = (email, password) => {
+const login = (email, password, rememberMe) => {
   return axios
     .post(`${NEWS_API_BASE_URL}/login`, {
       email,
       password,
+      remember_me: rememberMe,
     })
     .then((response) => {
-      const responseBody = JSON.stringify(response.data);
+      const responseBody = response.data;
 
       localStorage.setItem("userId", responseBody.id);
-      localStorage.setItem("accessToken", responseBody.accessToken);
+      localStorage.setItem("accessToken", responseBody.auth_resource.access_token);
 
       return responseBody;
     });
@@ -47,8 +49,10 @@ const logout = () => {
     });
 };
 
+
 export default {
   signup,
   login,
   logout,
 };
+

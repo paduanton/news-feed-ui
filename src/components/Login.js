@@ -1,4 +1,5 @@
 import React, { useState, useEffect }  from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 import Button from 'react-bootstrap/Button';
@@ -6,32 +7,35 @@ import Form from 'react-bootstrap/Form';
 import Alert from 'react-bootstrap/Alert';
 import Modal from 'react-bootstrap/Modal';
 
-import { signup } from "../actions/auth";
+import { login } from "../actions/auth";
 import { CLEAR_MESSAGE } from "../actions/types";
 
-const Signup = () => {
+const Login = (props) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [showAlertModal, setShowAlertModal] = useState(false);
 
   const { message } = useSelector(state => state.message);
+  const { isLoggedIn } = useSelector(state => state.auth);
 
-  const handleSignup = (event) => {
+  const handleLogin = (event) => {
     event.preventDefault();
     
-    const { name, username, email, password, rememberMe } = event.target; 
+    const { email, password, rememberMe } = event.target; 
 
     dispatch(
-      signup(
-        name.value.trim(), 
-        username.value.trim(),
+      login(
         email.value.trim(),
         password.value.trim(),
         rememberMe.checked
       )
-    );
+    ).then(() =>{
+      navigate("profile");
+      window.location.reload();
+    });
   };
-
+  
   useEffect(() => {
     if (!showAlertModal) {
       dispatch({ type: CLEAR_MESSAGE });
@@ -45,20 +49,14 @@ const Signup = () => {
     }
 
   }, [message]);
-  
+
+  if (isLoggedIn) {
+    return <Navigate to="/profile" />;
+  }
+
   return (
     <>
-      <Form onSubmit={handleSignup}>
-        <Form.Group className="mb-3" controlId="name">
-          <Form.Label>Name</Form.Label>
-          <Form.Control type="text" name="name" placeholder="Name" />
-        </Form.Group>
-
-        <Form.Group className="mb-3" controlId="username">
-          <Form.Label>Username</Form.Label>
-          <Form.Control type="text" name="username" placeholder="Enter username" />
-        </Form.Group>
-
+      <Form onSubmit={handleLogin}>
         <Form.Group className="mb-3" controlId="email">
           <Form.Label>Email address</Form.Label>
           <Form.Control type="email" name="email" placeholder="Enter email" />
@@ -97,4 +95,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default Login;
