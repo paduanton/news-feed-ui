@@ -1,5 +1,5 @@
 import axios from "axios";
-import NEWS_API_BASE_URL from "./env";
+import { NEWS_API_BASE_URL, authenticationHeader } from "./env";
 
 const signup = (name, username, email, password, rememberMe)  => {
   return axios.post(`${NEWS_API_BASE_URL}/signup`, {
@@ -11,11 +11,6 @@ const signup = (name, username, email, password, rememberMe)  => {
   })
   .then((response) => {
       const responseBody = response.data;
-
-
-      localStorage.setItem("userId", responseBody.id);
-      localStorage.setItem("accessToken", responseBody.auth_resource.access_token);
-
     return responseBody;
   });
 };
@@ -29,17 +24,16 @@ const login = (email, password, rememberMe) => {
     })
     .then((response) => {
       const responseBody = response.data;
-
-      localStorage.setItem("userId", responseBody.id);
-      localStorage.setItem("accessToken", responseBody.auth_resource.access_token);
-
       return responseBody;
     });
 };
 
 const logout = () => {
   return axios
-    .post(`${NEWS_API_BASE_URL}/logout`, {})
+    .post(`${NEWS_API_BASE_URL}/logout`,  
+    { 
+      headers: authenticationHeader()
+    })
     .then((response) => {
 
       localStorage.removeItem("userId");

@@ -31,8 +31,7 @@ const Login = (props) => {
         rememberMe.checked
       )
     ).then(() =>{
-      navigate("profile");
-      window.location.reload();
+      window.location.assign("/profile");
     });
   };
   
