@@ -11,17 +11,20 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import Card from 'react-bootstrap/Card';
 import Container from 'react-bootstrap/Container';
+import ListGroup from 'react-bootstrap/ListGroup';
 
 import { storeFeedPreference, deleteFeedPreference } from "../actions/feed";
 import { SET_MESSAGE, CLEAR_MESSAGE } from "../actions/types";
 
 import FeedService from "../services/feed.service";
+import ArticleService from "../services/article.service";
 
 const Feed = () => {
   const dispatch = useDispatch();
 
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [feedPreferencesData, setFeedPreferencesData] = useState([]);
+  const [articlesData, setArticlesData] = useState([]);
 
   const { user: authenticatedUser, isLoggedIn } = useSelector((state) => state.auth);
   const { message } = useSelector(state => state.message);
@@ -32,9 +35,11 @@ const Feed = () => {
     
     const { type, content } = event.target; 
     const preferences = feedPreferencesData;
-    const preferenceHasKeyWord = feedPreferencesData.some((item) => item.type === 'keyword');
+    const preferenceHasKeyWord = preferences.some((item) => item.type === 'keyword');
 
-    if(preferenceHasKeyWord) {
+   
+    if(preferenceHasKeyWord && type.value === 'keyword') {
+
       dispatch({
         type: SET_MESSAGE,
         payload: 'You already provided a keyword!',
@@ -46,9 +51,44 @@ const Feed = () => {
     preferences.push({ content: content.value, type: type.value});
     
     setFeedPreferencesData(preferences);
-
-    console.log(feedPreferencesData)
   };
+
+  const searchArticles = (event) => {
+    event.preventDefault();
+
+    const { dateSort } = event.target; 
+    const keyword = feedPreferencesData.find((feedPreference) => feedPreference.type === 'keyword').content;
+    const categories = feedPreferencesData.filter((feedPreference) => feedPreference.type === 'category').map((item) => {
+      return item.content
+    });
+    const sources = feedPreferencesData.filter((feedPreference) => feedPreference.type === 'source').map((item) => {
+      return item.content
+    });
+    const authors = feedPreferencesData.filter((feedPreference) => feedPreference.type === 'author').map((item) => {
+      return item.content
+    });
+
+    if(!keyword) {
+      dispatch({
+        type: SET_MESSAGE,
+        payload: 'You need to provide a keyword!',
+      });
+    } else {
+      console.log("keyword:", keyword);
+      console.log("categories:", categories);
+      console.log("authors:", authors);
+      console.log("sources:", sources);
+      console.log("dateSort:", dateSort.value);
+
+      ArticleService.getArticles(keyword, categories, sources, authors, dateSort.value)
+        .then((response) => {
+          setArticlesData(response.articles);
+        });
+    }
+  }
+
+  useEffect(() => console.log("feedPreferencesData:", feedPreferencesData), [feedPreferencesData])
+
   useEffect(() => {
     if (!showAlertModal) {
       dispatch({ type: CLEAR_MESSAGE });
@@ -62,6 +102,10 @@ const Feed = () => {
     }
 
   }, [message]);
+
+  const redirectTo = (url) => {
+    window.open(url, '_blank');
+  }
 
   if (!isLoggedIn) {
     return <Navigate to="/login" />;
@@ -90,7 +134,7 @@ const Feed = () => {
         </Col>
 
           <Col xs="auto">
-            <Button variant="primary" type="submit">
+            <Button variant="secondary" type="submit">
               Add Filter
             </Button>
           </Col>
@@ -105,33 +149,45 @@ const Feed = () => {
       ))}
 
       <Col xs="auto">
-        <Form.Group className="mb-3" controlId="dateSort">
-          <Form.Label>Sort by:</Form.Label>
-          <Form.Select aria-label="Default select example">
-            <option value="keyword">oldest</option>
-            <option value="author">newest</option>
-          </Form.Select>
-        </Form.Group>
-        <Form.Group className="d-grid gap-2" controlId="formBasicCheckbox">
-         <Button type="button">
-          Search
-         </Button>
-        </Form.Group>
+        <Form onSubmit={searchArticles}>
+          <Form.Group className="mb-3" controlId="dateSort">
+            <Form.Label>Sort by:</Form.Label>
+            <Form.Select name="dateSort" aria-label="Default select example">
+              <option value="newest">newest</option>
+              <option value="oldest">oldest</option>
+            </Form.Select>
+          </Form.Group>
+          <Form.Group className="d-grid gap-2" controlId="formBasicCheckbox">
+          <Button type="submit">
+            Search
+          </Button>
+          </Form.Group>
+        </Form>
       </Col>
       
       <Container>
         <Row>
-           <Card style={{ width: '18rem' }}>
-            <Card.Img variant="top" src="holder.js/100px180" />
+        {articlesData && articlesData.map((article, index) => (
+          <Card key={`card-article-${index}`}style={{ width: '18rem' }}>
+            {article.imageURL && <Card.Img variant="top" src={article.imageURL} />}
             <Card.Body>
-              <Card.Title>Card Title</Card.Title>
+              <Card.Title>{article.title}</Card.Title>
               <Card.Text>
-                Some quick example text to build on the card title and make up the
-                bulk of the card's content.
+                {article.description}
               </Card.Text>
-              <Button variant="primary">Go somewhere</Button>
+              <ListGroup variant="flush">
+                {article.author && <ListGroup.Item>Author: {article.author}</ListGroup.Item>}
+                {article.category && <ListGroup.Item>Category: {article.category}</ListGroup.Item>}
+                {article.section && <ListGroup.Item>Section: {article.section}</ListGroup.Item>}
+
+                <ListGroup.Item>Source: {article.source}</ListGroup.Item>
+                <ListGroup.Item>Published at: {article.publishedAt}</ListGroup.Item>
+              </ListGroup>
+              <Button variant="primary" onClick={() => redirectTo(article.sourceURL)}>Go to article source page</Button>
             </Card.Body>
           </Card>
+        ))}
+           
         </Row>
       </Container>
      

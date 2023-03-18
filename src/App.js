@@ -23,8 +23,6 @@ const App = () => {
 
   const logOut = useCallback(() => {
     dispatch(logout());
-
-    window.location.assign("/");
   }, [dispatch]);
 
   const redirectTo = (url) => {

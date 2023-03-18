@@ -10,7 +10,7 @@ const getArticles = (keyword, categories = [], sources = [], authors = [], dateS
     dateSort
   }).toString()
 
-  return axios.get(`${NEWS_API_BASE_URL}/users/${keyword}/feed_preferences?${queryParams}`, 
+  return axios.get(`${NEWS_API_BASE_URL}/articles/${keyword}/search?${queryParams}`, 
     { 
       headers: authenticationHeader()
     }
