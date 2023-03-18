@@ -32,6 +32,16 @@ const Feed = () => {
     
     const { type, content } = event.target; 
     const preferences = feedPreferencesData;
+    const preferenceHasKeyWord = feedPreferencesData.some((item) => item.type === 'keyword');
+
+    if(preferenceHasKeyWord) {
+      dispatch({
+        type: SET_MESSAGE,
+        payload: 'You already provided a keyword!',
+      });
+
+      return false;
+    }
 
     preferences.push({ content: content.value, type: type.value});
     
@@ -87,8 +97,6 @@ const Feed = () => {
         </Row>
       </Form>
 
-      <Badge  bg="secondary">
-ddd        </Badge>
       {feedPreferencesData && feedPreferencesData.map((feedPreference, index) => (
         <Badge key={`content-${feedPreference.content}-${index}-feed`}  bg="secondary">
           {feedPreference.content}:{feedPreference.type}
@@ -105,12 +113,12 @@ ddd        </Badge>
           </Form.Select>
         </Form.Group>
         <Form.Group className="d-grid gap-2" controlId="formBasicCheckbox">
-         <Button type="button" class="btn-block">
+         <Button type="button">
           Search
          </Button>
         </Form.Group>
       </Col>
-
+      
       <Container>
         <Row>
            <Card style={{ width: '18rem' }}>
