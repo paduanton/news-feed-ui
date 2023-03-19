@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate } from 'react-router-dom';
 
@@ -30,30 +30,6 @@ const Feed = () => {
 
   const { user: authenticatedUser, isLoggedIn } = useSelector((state) => state.auth);
   const { message } = useSelector(state => state.message);
-
-
-  const addFilter = (event) => {
-    event.preventDefault();
-    
-    const { type, content } = event.target; 
-    const preferences = feedPreferencesData;
-    const preferenceHasKeyWord = preferences.some((item) => item.type === 'keyword');
-
-   
-    if(preferenceHasKeyWord && type.value === 'keyword') {
-
-      dispatch({
-        type: SET_MESSAGE,
-        payload: 'You already provided a keyword!',
-      });
-
-      return false;
-    }
-
-    preferences.push({ content: content.value, type: type.value});
-    
-    setFeedPreferencesData(preferences);
-  };
 
   const searchArticles = (event) => {
     event.preventDefault();
@@ -88,6 +64,32 @@ const Feed = () => {
         });
     }
   }
+
+  const addFilter = async (event) => {
+    event.preventDefault();
+    
+    const { type, content } = event.target; 
+
+    dispatch(
+      storeFeedPreference(
+        authenticatedUser.userId, content.value, type.value
+      )
+    ).then(() => {
+      fetchFeedPreferencesData(authenticatedUser.userId);
+    }); 
+  };
+
+  const fetchFeedPreferencesData = async (userId) => {
+    const feedPreferencesData = await FeedService.getUserFeedPreferences(userId);
+
+    setFeedPreferencesData(feedPreferencesData);
+    
+    return feedPreferencesData;
+  }
+
+  useEffect(() => {    
+    fetchFeedPreferencesData(authenticatedUser.userId);
+  }, [])
 
   useEffect(() => {
     if (!showAlertModal) {
@@ -141,9 +143,13 @@ const Feed = () => {
         </Row>
       </Form>
 
-      {feedPreferencesData && feedPreferencesData.map((feedPreference, index) => (
-        <Badge key={`content-${feedPreference.content}-${index}-feed`}  bg="secondary">
+      {feedPreferencesData && feedPreferencesData?.map((feedPreference, index) => (
+        <Badge key={`content-${feedPreference.content}-${index}-feed`} className="m-1" bg="secondary">
           {feedPreference.content}:{feedPreference.type}
+          {" "}
+          <Badge onClick={() => deleteFeedPreference}key={`delete-${feedPreference.content}-${index}-feed`} className="m-1" bg="danger">
+            X
+          </Badge>
         </Badge>
            
       ))}

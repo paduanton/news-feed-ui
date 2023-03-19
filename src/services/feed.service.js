@@ -38,12 +38,20 @@ const getUserFeedPreferences = (id)  => {
     }
   )
   .then((response) => {
-    const { type, content, created_at } = response.data;
-    return {
-      type,
-      content,
-      createdAt: created_at,
-    };
+    const feedPreferences = response.data;
+
+    const parsedFeedPreferences = feedPreferences.map((feedPreference) => {
+      const { id, type, content, created_at } = feedPreference;
+      
+      return {
+        id,
+        type,
+        content,
+        createdAt: created_at,
+      };
+    });
+
+    return parsedFeedPreferences;
   });
 };
 
