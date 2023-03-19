@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Routes, Route, } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 
 import Navbar from 'react-bootstrap/Navbar';
 import Container from 'react-bootstrap/Container';
@@ -16,18 +16,20 @@ import Profile from "./Pages/Profile";
 import { logout } from "./actions/auth";
 
 
+
 const App = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const { isLoggedIn } = useSelector((state) => state.auth);
 
   const logOut = useCallback(() => {
-    dispatch(logout());
+    dispatch(
+      logout()
+    ).then(() => {
+      navigate('/login')
+    });
   }, [dispatch]);
-
-  const redirectTo = (url) => {
-    window.location.assign(url);
-  }
 
   return (
     <div>
@@ -39,15 +41,15 @@ const App = () => {
           <Navbar.Text>
           {isLoggedIn ? (
             <>
-              <Button variant="light" onClick={() => redirectTo("/profile")}>Profile</Button>
+              <Button variant="light" onClick={() => navigate("/profile")}>Profile</Button>
               {' '}
               <Button variant="light" onClick={() => logOut()}>Logout</Button>
             </>
             ) : (
               <>
-               <Button variant="light" onClick={() => redirectTo("/login")}>Login</Button>
+               <Button variant="light" onClick={() => navigate("/login")}>Login</Button>
                 {' '}
-                <Button variant="light" onClick={() => redirectTo("/signup")}>Signup</Button>
+                <Button variant="light" onClick={() => navigate("/signup")}>Signup</Button>
               </>
             )}
           </Navbar.Text>

@@ -84,7 +84,7 @@ export const logout = () => (dispatch) => {
   return AuthService.logout().then(
     (data) => {
       localStorage.removeItem("userId");
-      localStorage.setItem("accessToken");
+      localStorage.removeItem("accessToken");
 
       dispatch({
         type: LOGOUT,

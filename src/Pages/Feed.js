@@ -20,6 +20,11 @@ import { SET_MESSAGE, CLEAR_MESSAGE } from "../actions/types";
 import FeedService from "../services/feed.service";
 import ArticleService from "../services/article.service";
 
+// TODO
+/*
+  Split page sections in smaller components
+*/
+
 const Feed = () => {
   const dispatch = useDispatch();
 
@@ -37,14 +42,15 @@ const Feed = () => {
     setSearchLoading(true);
 
     const { dateSort } = event.target; 
-    const keyword = feedPreferencesData.find((feedPreference) => feedPreference.type === 'keyword')?.content;
-    const categories = feedPreferencesData.filter((feedPreference) => feedPreference.type === 'category').map((item) => {
+
+    const keyword = feedPreferencesData?.find((feedPreference) => feedPreference.type === 'keyword')?.content;
+    const categories = feedPreferencesData?.filter((feedPreference) => feedPreference.type === 'category').map((item) => {
       return item.content
     });
-    const sources = feedPreferencesData.filter((feedPreference) => feedPreference.type === 'source').map((item) => {
+    const sources = feedPreferencesData?.filter((feedPreference) => feedPreference.type === 'source').map((item) => {
       return item.content
     });
-    const authors = feedPreferencesData.filter((feedPreference) => feedPreference.type === 'author').map((item) => {
+    const authors = feedPreferencesData?.filter((feedPreference) => feedPreference.type === 'author').map((item) => {
       return item.content
     });
 
@@ -80,7 +86,9 @@ const Feed = () => {
   };
 
   const fetchFeedPreferencesData = async (userId) => {
-    const feedPreferencesData = await FeedService.getUserFeedPreferences(userId);
+    const feedPreferencesData = await FeedService.getUserFeedPreferences(userId).
+    catch((error) => {
+    });
 
     setFeedPreferencesData(feedPreferencesData);    
   }
@@ -94,7 +102,7 @@ const Feed = () => {
   }
 
   useEffect(() => {    
-    fetchFeedPreferencesData(authenticatedUser.userId);
+    fetchFeedPreferencesData(authenticatedUser?.userId);
   }, [])
 
   useEffect(() => {

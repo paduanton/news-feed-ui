@@ -1,5 +1,5 @@
 import React, { useState, useEffect }  from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate} from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 import Button from 'react-bootstrap/Button';
@@ -12,6 +12,7 @@ import { CLEAR_MESSAGE } from "../actions/types";
 
 const Login = (props) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [showAlertModal, setShowAlertModal] = useState(false);
 
@@ -30,7 +31,7 @@ const Login = (props) => {
         rememberMe.checked
       )
     ).then(() =>{
-      window.location.assign("/feed");
+      navigate("/feed")
     });
   };
   

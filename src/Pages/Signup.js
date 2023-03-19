@@ -1,4 +1,5 @@
 import React, { useState, useEffect }  from "react";
+import { useNavigate} from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 import Button from 'react-bootstrap/Button';
@@ -11,6 +12,7 @@ import { CLEAR_MESSAGE } from "../actions/types";
 
 const Signup = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [showAlertModal, setShowAlertModal] = useState(false);
 
@@ -29,6 +31,8 @@ const Signup = () => {
         password.value.trim(),
         rememberMe.checked
       )
+    ).then(() =>
+      navigate("/feed")
     );
   };
 
