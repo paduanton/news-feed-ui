@@ -1,58 +1,74 @@
-import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
-import './App.css';
+import React, { useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Routes, Route, useNavigate } from "react-router-dom";
 
-function App() {
+import Navbar from 'react-bootstrap/Navbar';
+import Container from 'react-bootstrap/Container';
+import Button from 'react-bootstrap/Button';
+
+import "bootstrap/dist/css/bootstrap.min.css";
+
+import Login from "./Pages/Login";
+import Signup from "./Pages/Signup";
+import Feed from "./Pages/Feed";
+import Profile from "./Pages/Profile";
+
+import { logout } from "./actions/auth";
+
+
+
+const App = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { isLoggedIn } = useSelector((state) => state.auth);
+
+  const logOut = useCallback(() => {
+    dispatch(
+      logout()
+    ).then(() => {
+      navigate('/login')
+    });
+  }, [dispatch]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
+    <div>
+      <Navbar bg="dark" variant="dark">
+      <Container>
+        <Navbar.Brand href="/">News Feed App</Navbar.Brand>
+        <Navbar.Toggle />
+        <Navbar.Collapse className="justify-content-end">
+          <Navbar.Text>
+          {isLoggedIn ? (
+            <>
+              <Button variant="light" onClick={() => navigate("/profile")}>Profile</Button>
+              {' '}
+              <Button variant="light" onClick={() => logOut()}>Logout</Button>
+            </>
+            ) : (
+              <>
+               <Button variant="light" onClick={() => navigate("/login")}>Login</Button>
+                {' '}
+                <Button variant="light" onClick={() => navigate("/signup")}>Signup</Button>
+              </>
+            )}
+          </Navbar.Text>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
+
+      <div className="container mt-3">
+        <Routes>
+          <Route path="/" element={<Feed />} />
+          <Route path="/feed" element={<Feed />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/profile" element={<Profile />} />
+        </Routes>
+      </div>
+
     </div>
   );
-}
+};
 
 export default App;
