@@ -14,13 +14,14 @@ easy-to-read format. It was developed in ReactJS and this repository is the Fron
 After clonning the repo, run the following commands on bash, inside the root directory:
 
 Install dependencies:
-
+```
 npm install
-
+```
 
 Build and run the application:
-
+```
 docker-compose up --build
+```
 
 And that's it!
 
