@@ -82,9 +82,15 @@ const Feed = () => {
   const fetchFeedPreferencesData = async (userId) => {
     const feedPreferencesData = await FeedService.getUserFeedPreferences(userId);
 
-    setFeedPreferencesData(feedPreferencesData);
-    
-    return feedPreferencesData;
+    setFeedPreferencesData(feedPreferencesData);    
+  }
+
+  const deleteFeedPreferenceData = async (id) => {
+    dispatch(
+      deleteFeedPreference(id)
+    ).then(() => {
+      fetchFeedPreferencesData(authenticatedUser.userId);
+    }); 
   }
 
   useEffect(() => {    
@@ -147,7 +153,11 @@ const Feed = () => {
         <Badge key={`content-${feedPreference.content}-${index}-feed`} className="m-1" bg="secondary">
           {feedPreference.content}:{feedPreference.type}
           {" "}
-          <Badge onClick={() => deleteFeedPreference}key={`delete-${feedPreference.content}-${index}-feed`} className="m-1" bg="danger">
+          <Badge 
+            className="m-1 hover-cursor-pointer"
+            onClick={() => deleteFeedPreferenceData(feedPreference.id)} 
+            key={`delete-${feedPreference.content}-${index}-feed`}
+            bg="danger">
             X
           </Badge>
         </Badge>
@@ -177,7 +187,7 @@ const Feed = () => {
       <Container className="mt-4">
       {articlesData.totalResults && `Total results: ${articlesData.totalResults}`}
         <Row className="d-flex justify-content-center">
-        {articlesData ? articlesData.articles?.map((article, index) => (
+        {articlesData.articles ? articlesData.articles.map((article, index) => (
           <Card key={`card-article-${index}`}style={{ width: '18rem' }} className="pt-4 m-1">
             {article.imageURL && <Card.Img variant="top" src={article.imageURL} />}
             <Card.Body>

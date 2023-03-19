@@ -1,8 +1,6 @@
 import {
   SIGNUP_SUCCESS,
-  SIGNUP_FAIL,
   LOGIN_SUCCESS,
-  LOGIN_FAIL,
   LOGOUT,
 } from "../actions/types";
 
@@ -26,23 +24,11 @@ export default function auth (state = initialState, action) {
         isLoggedIn: true,
         user: payload.user,
       };
-    case SIGNUP_FAIL:
-      return {
-        ...state,
-        isLoggedIn: false,
-        user: null
-      };
     case LOGIN_SUCCESS:
       return {
         ...state,
         isLoggedIn: true,
         user: payload.user,
-      };
-    case LOGIN_FAIL:
-      return {
-        ...state,
-        isLoggedIn: false,
-        user: null,
       };
     case LOGOUT:
       return {
