@@ -24,7 +24,7 @@ docker-compose up --build
 
 And that's it!
 
-To view your application, go to http://localhost:3000/ on your browser.
+To view your application, go to http://localhost:3000/ on your web browser.
 
 ### Notes:
 

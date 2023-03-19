@@ -32,7 +32,7 @@ const getArticles = (keyword, categories = [], sources = [], authors = [], dateS
     });
 
     return {
-      total_results,
+      totalResults: total_results,
       articles: parsedArticles,
     }
   });

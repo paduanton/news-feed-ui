@@ -8,10 +8,10 @@ import Button from 'react-bootstrap/Button';
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import Login from "./components/Login";
-import Signup from "./components/Signup";
-import Feed from "./components/Feed";
-import Profile from "./components/Profile";
+import Login from "./Pages/Login";
+import Signup from "./Pages/Signup";
+import Feed from "./Pages/Feed";
+import Profile from "./Pages/Profile";
 
 import { logout } from "./actions/auth";
 

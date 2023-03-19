@@ -12,6 +12,7 @@ import Row from 'react-bootstrap/Row';
 import Card from 'react-bootstrap/Card';
 import Container from 'react-bootstrap/Container';
 import ListGroup from 'react-bootstrap/ListGroup';
+import Spinner from 'react-bootstrap/Spinner';
 
 import { storeFeedPreference, deleteFeedPreference } from "../actions/feed";
 import { SET_MESSAGE, CLEAR_MESSAGE } from "../actions/types";
@@ -25,6 +26,7 @@ const Feed = () => {
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [feedPreferencesData, setFeedPreferencesData] = useState([]);
   const [articlesData, setArticlesData] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
 
   const { user: authenticatedUser, isLoggedIn } = useSelector((state) => state.auth);
   const { message } = useSelector(state => state.message);
@@ -56,8 +58,10 @@ const Feed = () => {
   const searchArticles = (event) => {
     event.preventDefault();
 
+    setSearchLoading(true);
+
     const { dateSort } = event.target; 
-    const keyword = feedPreferencesData.find((feedPreference) => feedPreference.type === 'keyword').content;
+    const keyword = feedPreferencesData.find((feedPreference) => feedPreference.type === 'keyword')?.content;
     const categories = feedPreferencesData.filter((feedPreference) => feedPreference.type === 'category').map((item) => {
       return item.content
     });
@@ -73,21 +77,17 @@ const Feed = () => {
         type: SET_MESSAGE,
         payload: 'You need to provide a keyword!',
       });
-    } else {
-      console.log("keyword:", keyword);
-      console.log("categories:", categories);
-      console.log("authors:", authors);
-      console.log("sources:", sources);
-      console.log("dateSort:", dateSort.value);
 
+      setSearchLoading(false)
+    } else {
       ArticleService.getArticles(keyword, categories, sources, authors, dateSort.value)
         .then((response) => {
-          setArticlesData(response.articles);
+          setArticlesData(response);
+        }).finally(() => {
+          setSearchLoading(false)
         });
     }
   }
-
-  useEffect(() => console.log("feedPreferencesData:", feedPreferencesData), [feedPreferencesData])
 
   useEffect(() => {
     if (!showAlertModal) {
@@ -148,7 +148,7 @@ const Feed = () => {
            
       ))}
 
-      <Col xs="auto">
+      <Col xs="auto" className="mt-2">
         <Form onSubmit={searchArticles}>
           <Form.Group className="mb-3" controlId="dateSort">
             <Form.Label>Sort by:</Form.Label>
@@ -158,17 +158,21 @@ const Feed = () => {
             </Form.Select>
           </Form.Group>
           <Form.Group className="d-grid gap-2" controlId="formBasicCheckbox">
-          <Button type="submit">
-            Search
+          <Button type="submit" disabled={searchLoading}>
+            {searchLoading && <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true" /> }
+            {searchLoading && 'Loading' }
+            {!searchLoading && 'Search' }
+
           </Button>
           </Form.Group>
         </Form>
       </Col>
       
-      <Container>
-        <Row>
-        {articlesData && articlesData.map((article, index) => (
-          <Card key={`card-article-${index}`}style={{ width: '18rem' }}>
+      <Container className="mt-4">
+      {articlesData.totalResults && `Total results: ${articlesData.totalResults}`}
+        <Row className="d-flex justify-content-center">
+        {articlesData ? articlesData.articles?.map((article, index) => (
+          <Card key={`card-article-${index}`}style={{ width: '18rem' }} className="pt-4 m-1">
             {article.imageURL && <Card.Img variant="top" src={article.imageURL} />}
             <Card.Body>
               <Card.Title>{article.title}</Card.Title>
@@ -186,7 +190,7 @@ const Feed = () => {
               <Button variant="primary" onClick={() => redirectTo(article.sourceURL)}>Go to article source page</Button>
             </Card.Body>
           </Card>
-        ))}
+        )) : 'No articles to show at this time, please update your filters and try again!'}
            
         </Row>
       </Container>
